@@ -47,10 +47,31 @@ class main:
                           [sg.Table(values=data_produtos, headings=headings_produtos, key='tabela_estoque',
                                     expand_x=True, expand_y=True, vertical_scroll_only=False, auto_size_columns=True)],
                           [sg.Button('Atualizar')]]
+        
+        layout_entrada_l = [
+                            [sg.Text('Quantidade: ')],
+                            [sg.Text('Valor de custo: ')],
+                            [sg.Text('Margem bruta (%): ')],
+                            [sg.Text('Valor de venda calculado: ')],
+                            [sg.Text('Valor de venda a aplicar: ')],
+        ]
 
-        layout_entrada = [[sg.Text('Entrada no estoque dos produtos')],
-                          [sg.Input(size=(25,1)), sg.Button("...")],
-                          [sg.Button('Enviar', key='-BUTTON2-')]]
+        layout_entrada_r = [
+                            
+                            [sg.Input(key='quantidade_entrada_produtos', default_text=1)],
+                            [sg.Input(key='vr_custo_entrada_produtos')],
+                            [sg.Input(key='margem_entrada_produtos')],
+                            [sg.Text('R$ 0,00', key='vr_calculado_entrada_produtos')],
+                            [sg.Input(key='vr_venda_entrada_produtos')],
+        ]
+        
+        layout_entrada = [[sg.Text('Entrada no estoque dos produtos', font=(36))],
+                          [sg.HorizontalSeparator()],
+                          [sg.Text("Produto: "), sg.Input(size=(50,1), key='input_entrada_produtos'), sg.Button("...", key='consulta_entrada_produtos')],
+                          [sg.HorizontalSeparator()],
+                          [sg.Col(layout_entrada_l), sg.Col(layout_entrada_r)],
+                          [sg.Button('Salvar', key='salvar_entrada_produtos')]
+        ]
 
         layout_venda = [[sg.Text('Conteúdo da Aba 3')],
                         [sg.Input(key='-INPUT3-')],
@@ -108,7 +129,8 @@ class main:
                 data = self.fetch_data_from_db('produtos')
                 window['tabela_estoque'].update(values=data)
                 sg.popup("Cadastro realizado com sucesso!")
-            #elif event ==''
+            #elif event =='salvar_entrada_produtos':
+
 
         window.close()
 
