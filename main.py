@@ -108,9 +108,15 @@ class main:
         ]
 
         layout_venda = [
-            [sg.Text('Conteúdo da Aba 3')],
-            [sg.Input(key='-INPUT3-')],
-            [sg.Button('Enviar', key='-BUTTON3-')]]
+            [sg.Text('Venda (saída) de produtos', font=(36))],
+            [sg.HorizontalSeparator()],
+            [sg.Text("Produto: "), sg.Input(size=(50,1), key='input_venda_produtos'), sg.Button("...", key='consulta_venda_produtos')],
+            [sg.Text("Quantidade: "), sg.Input(key='quantidade_venda_produtos', default_text=1, enable_events=True)],
+            [sg.HorizontalSeparator()],
+            [sg.Text("Valor total: "), sg.Text("R$ 0,00", key='vr_total_venda')],
+            [sg.Text("Valor pago: "), sg.Input(key='vr_pago')],
+            [sg.Text("Troco: "), sg.Text("R$ 0,00", key='troco')],
+            [sg.Button('Salvar', key='salvar_venda_produtos')]]
 
         layout_cadastro_l = [
             [sg.Text('Descrição: ')],
@@ -203,7 +209,23 @@ class main:
                 window['vr_calculado_entrada_produtos'].update(value = 'R$ 0.00')
                 self.conn.commit()
                 sg.Popup("Entrada realizada com sucesso!")
-                
+            elif event == 'consulta_venda_produtos':
+                cursor.execute(f"select id_produto, descricao, quantidade from produtos where descricao like '%{values['input_venda_produtos']}%';")
+                selecionado = self.telaconsulta(cursor.fetchall())
+                if selecionado==0:
+                    continue
+                produto_atual = self.adquirir_produto(selecionado)
+                window['input_venda_produtos'].update(value=produto_atual[1])
+                if values['quantidade_venda_produtos']:
+                    valor_total = produto_atual[4] * int(values['quantidade_venda_produtos'])
+                    window['vr_total_venda'].update(value = f'R$ {float(valor_total)}')
+            elif event == 'quantidade_venda_produtos':
+                if values['quantidade_venda_produtos']:
+                    valor_total = produto_atual[4] * int(values['quantidade_venda_produtos'])
+                    valor_troco = float(values['vr_pago']) - valor_total
+                    window['vr_total_venda'].update(value = f'R$ {float(valor_total)}')
+                    window['troco'].update(value = f'R$ {valor_troco}')
+
         window.close()
 
 main().window()
