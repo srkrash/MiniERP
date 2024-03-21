@@ -11,7 +11,13 @@ CREATE TABLE vendas (
 	id_venda INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	id_produto INTEGER NOT NULL,
 	dt_hr_venda TEXT NOT NULL,
-	quantidade NUMERIC DEFAULT (0) NOT NULL
+	quantidade NUMERIC DEFAULT (0) NOT NULL,
+	vr_venda NUMERIC DEFAULT (0) NOT NULL,
+    vr_total NUMERIC DEFAULT (0) NOT NULL,
+    vr_pago NUMERIC DEFAULT (0) NOT NULL,
+	vr_custo NUMERIC DEFAULT (0) NOT NULL,
+	vr_troco NUMERIC DEFAULT (0) NOT NULL,
+	CONSTRAINT vendas_produtos_FK FOREIGN KEY (id_produto) REFERENCES produtos(id_produto) ON DELETE CASCADE ON UPDATE CASCADE
 );
                """)
 
@@ -31,7 +37,10 @@ CREATE TABLE entradas (
 	id_entrada INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	id_produto INTEGER NOT NULL,
 	dt_hr_entrada TEXT NOT NULL,
-	quantidade NUMERIC DEFAULT (0) NOT NULL
+	quantidade NUMERIC DEFAULT (0) NOT NULL, 
+    vr_venda NUMERIC DEFAULT (0) NOT NULL, 
+    vr_custo NUMERIC DEFAULT (0) NOT NULL,
+	CONSTRAINT entradas_produtos_FK FOREIGN KEY (id_produto) REFERENCES produtos(id_produto) ON DELETE CASCADE ON UPDATE CASCADE
 );
                """)
 

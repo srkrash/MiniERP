@@ -6,6 +6,7 @@ from datetime import datetime
 class main:
     def __init__(self) -> None:
         self.conn = None
+        self.tamanho_letra=24
 
     def fazer_conexao(self):
         self.conn = sqlite3.connect('database.db')
@@ -53,9 +54,9 @@ class main:
     def telaconsulta(self, produtos):
         headings = ["id_produto", "descricao", "quantidade"]
         layout_tela = [
-            [sg.Button('Confirmar'), sg.Button('Cancelar')],
+            [sg.Button('Confirmar', font=self.tamanho_letra), sg.Button('Cancelar', font=self.tamanho_letra)],
             [sg.HorizontalSeparator()],
-            [sg.Table(values=produtos, headings=headings, expand_x=True, expand_y=True, enable_events=True, key='tabela')],
+            [sg.Table(values=produtos, headings=headings, expand_x=True, expand_y=True, enable_events=True, key='tabela', font=self.tamanho_letra)],
         ]
         window = sg.Window("Seleção de produtos", layout_tela ,size=(600,600))
 
@@ -77,70 +78,70 @@ class main:
         data_produtos = self.fetch_data_from_db('produtos')
         # Definindo os layouts de cada aba
         layout_estoque = [
-            [sg.Text('Estoque')],
+            [sg.Text('Estoque', font=self.tamanho_letra)],
             [sg.Table(values=data_produtos, headings=headings_produtos, key='tabela_estoque',
-                    expand_x=True, expand_y=True, vertical_scroll_only=False, auto_size_columns=True)],
-            [sg.Button('Atualizar')]]
+                    expand_x=True, expand_y=True, vertical_scroll_only=False, auto_size_columns=True, font=self.tamanho_letra, justification='left') ],
+            [sg.Button('Atualizar', font=self.tamanho_letra)]]
         
         layout_entrada_l = [
-            [sg.Text('Quantidade: ')],
-            [sg.Text('Valor de custo: ')],
-            [sg.Text('Margem bruta (%): ')],
-            [sg.Text('Valor de venda calculado: ')],
-            [sg.Text('Valor de venda a aplicar: ')],
+            [sg.Text('Quantidade: ', font=self.tamanho_letra)],
+            [sg.Text('Valor de custo: ', font=self.tamanho_letra)],
+            [sg.Text('Margem bruta (%): ', font=self.tamanho_letra)],
+            [sg.Text('Valor de venda calculado: ', font=self.tamanho_letra)],
+            [sg.Text('Valor de venda a aplicar: ', font=self.tamanho_letra)],
         ]
 
         layout_entrada_r = [
-            [sg.Input(key='quantidade_entrada_produtos', default_text=1)],
-            [sg.Input(key='vr_custo_entrada_produtos')],
-            [sg.Input(key='margem_entrada_produtos', default_text=0, enable_events=True)],
-            [sg.Text('R$ 0,00', key='vr_calculado_entrada_produtos')],
-            [sg.Input(key='vr_venda_entrada_produtos')],
+            [sg.Input(key='quantidade_entrada_produtos', default_text=1, font=self.tamanho_letra)],
+            [sg.Input(key='vr_custo_entrada_produtos', font=self.tamanho_letra)],
+            [sg.Input(key='margem_entrada_produtos', default_text=0, enable_events=True, font=self.tamanho_letra)],
+            [sg.Text('R$ 0,00', key='vr_calculado_entrada_produtos', font=self.tamanho_letra)],
+            [sg.Input(key='vr_venda_entrada_produtos', font=self.tamanho_letra)],
         ]
         
         layout_entrada = [
-            [sg.Text('Entrada no estoque dos produtos', font=(36))],
+            [sg.Text('Entrada no estoque dos produtos', font=self.tamanho_letra)],
             [sg.HorizontalSeparator()],
-            [sg.Text("Produto: "), sg.Input(size=(50,1), key='input_entrada_produtos'), sg.Button("...", key='consulta_entrada_produtos')],
+            [sg.Text("Produto: ", font=self.tamanho_letra), sg.Input(size=(50,1), key='input_entrada_produtos', font=self.tamanho_letra), sg.Button("...", key='consulta_entrada_produtos', font=self.tamanho_letra)],
             [sg.HorizontalSeparator()],
             [sg.Col(layout_entrada_l), sg.Col(layout_entrada_r)],
-            [sg.Button('Salvar', key='salvar_entrada_produtos')]
+            [sg.Button('Salvar', key='salvar_entrada_produtos', font=self.tamanho_letra)]
         ]
 
         layout_venda = [
-            [sg.Text('Venda (saída) de produtos', font=(36))],
+            [sg.Text('Venda (saída) de produtos', font=self.tamanho_letra)],
             [sg.HorizontalSeparator()],
-            [sg.Text("Produto: "), sg.Input(size=(50,1), key='input_venda_produtos'), sg.Button("...", key='consulta_venda_produtos')],
-            [sg.Text("Quantidade: "), sg.Input(key='quantidade_venda_produtos', default_text=1, enable_events=True)],
+            [sg.Text("Produto: ", font=self.tamanho_letra), sg.Input(size=(50,1), key='input_venda_produtos', font=self.tamanho_letra), sg.Button("...", key='consulta_venda_produtos', font=self.tamanho_letra)],
+            [sg.Text("Quantidade: ", font=self.tamanho_letra), sg.Input(key='quantidade_venda_produtos', default_text=1, enable_events=True, font=self.tamanho_letra)],
             [sg.HorizontalSeparator()],
-            [sg.Text("Valor total: "), sg.Text("R$ 0,00", key='vr_total_venda')],
-            [sg.Text("Valor pago: "), sg.Input(key='vr_pago')],
-            [sg.Text("Troco: "), sg.Text("R$ 0,00", key='troco')],
-            [sg.Button('Salvar', key='salvar_venda_produtos')]]
+            [sg.Text("Valor total: ", font=self.tamanho_letra), sg.Text("R$ 0,00", key='vr_total_venda', font=self.tamanho_letra)],
+            [sg.Text("Valor pago: ", font=self.tamanho_letra), sg.Input(key='vr_pago', enable_events=True, font=self.tamanho_letra)],
+            [sg.Text("Troco: ", font=self.tamanho_letra), sg.Text("R$ 0,00", key='troco', font=self.tamanho_letra)],
+            [sg.Button('Salvar', key='salvar_venda_produtos', font=self.tamanho_letra)]]
 
         layout_cadastro_l = [
-            [sg.Text('Descrição: ')],
-            [sg.Text('Unidade')],
-            [sg.Text('Quantidade inicial')],
-            [sg.Text('Valor de venda:')],
-            [sg.Text('Valor de custo')],
+            [sg.Text('Descrição: ', font=self.tamanho_letra)],
+            [sg.Text('Unidade', font=self.tamanho_letra)],
+            [sg.Text('Quantidade inicial', font=self.tamanho_letra)],
+            [sg.Text('Valor de venda:', font=self.tamanho_letra)],
+            [sg.Text('Valor de custo', font=self.tamanho_letra)],
         ]
         layout_cadastro_r = [
-            [sg.Input(key='descricao')],
-            [sg.Input(key='unidade')],
-            [sg.Input(default_text='0', key='quantidade')],
-            [sg.Input(key='vr_venda')],
-            [sg.Input(key='vr_custo')],
+            [sg.Input(key='descricao', font=self.tamanho_letra)],
+            [sg.Input(key='unidade', font=self.tamanho_letra)],
+            [sg.Input(default_text='0', key='quantidade', font=self.tamanho_letra)],
+            [sg.Input(key='vr_venda', font=self.tamanho_letra)],
+            [sg.Input(key='vr_custo', font=self.tamanho_letra)],
         ]
         layout_cadastro = [
-            [sg.Text('Cadastro de produtos')],
+            [sg.Text('Cadastro de produtos', font=self.tamanho_letra)],
             [sg.Col(layout_cadastro_l), sg.Col(layout_cadastro_r)],
-            [sg.Button("Salvar", key='salvar_cadastro')],
+            [sg.Button("Salvar", key='salvar_cadastro', font=self.tamanho_letra)],
         ]
         layout_sobre = [
-            [sg.Text("Desenvolvido por Fay Klagenberg")],
-            [sg.Text("Versão 1.0 Alpha - 20/03/2024")],
-            [sg.Text("Contato: (64) 99213-9766")],
+            [sg.Text("Desenvolvido por Fay Klagenberg", font=self.tamanho_letra)],
+            [sg.Text("Versão 1.0 Alpha - 20/03/2024", font=self.tamanho_letra)],
+            [sg.Text("Contato: (64) 99213-9766", font=self.tamanho_letra)],
         ]
 
         # Definindo a estrutura da janela com as abas
@@ -149,7 +150,7 @@ class main:
                                 sg.Tab('Realizar Venda', layout_venda),
                                 sg.Tab('Cadastro de produtos', layout_cadastro),
                                 sg.Tab('Sobre', layout_sobre),
-        ]], expand_x=True, expand_y=True)
+        ]], expand_x=True, expand_y=True, font=self.tamanho_letra)
                    ]]
 
         # Criando a janela
@@ -199,9 +200,9 @@ class main:
                                vr_venda={float(values['vr_venda_entrada_produtos'])}, 
                                vr_custo={float(values['vr_custo_entrada_produtos'])} 
                                where id_produto={produto_atual[0]};''')
-                tempo_atual = self.tempo_atual()
-                cursor.execute(f"""insert into entradas (id_produto, dt_hr_entrada, quantidade)
-                               values ({produto_atual[0]}, '{self.tempo_atual()}', {float(values['quantidade_entrada_produtos'])})""")
+                cursor.execute(f"""insert into entradas (id_produto, dt_hr_entrada, quantidade, vr_venda, vr_custo)
+                               values ({produto_atual[0]}, '{self.tempo_atual()}', {float(values['quantidade_entrada_produtos'])}, 
+                               {float(values['vr_venda_entrada_produtos'])}, {float(values['vr_custo_entrada_produtos'])})""")
                 window['quantidade_entrada_produtos'].update(value = 1)
                 window['vr_custo_entrada_produtos'].update(value = '')
                 window['margem_entrada_produtos'].update(value = 0)
@@ -222,9 +223,30 @@ class main:
             elif event == 'quantidade_venda_produtos':
                 if values['quantidade_venda_produtos']:
                     valor_total = produto_atual[4] * int(values['quantidade_venda_produtos'])
-                    valor_troco = float(values['vr_pago']) - valor_total
                     window['vr_total_venda'].update(value = f'R$ {float(valor_total)}')
-                    window['troco'].update(value = f'R$ {valor_troco}')
+                    if values['vr_pago']:
+                        valor_troco = float(values['vr_pago']) - valor_total
+                        window['troco'].update(value = f'R$ {valor_troco}')
+            elif event == 'vr_pago':
+                if values['quantidade_venda_produtos']:
+                    valor_total = produto_atual[4] * int(values['quantidade_venda_produtos'])
+                    window['vr_total_venda'].update(value = f'R$ {float(valor_total)}')
+                    if values['vr_pago']:
+                        valor_troco = float(values['vr_pago']) - valor_total
+                        window['troco'].update(value = f'R$ {valor_troco}')
+            elif event == 'salvar_venda_produtos':
+                cursor.execute(f'''update produtos set 
+                               quantidade={produto_atual[3]-float(values['quantidade_venda_produtos'])}
+                               where id_produto={produto_atual[0]};''')
+                cursor.execute(f"""insert into vendas (id_produto, dt_hr_venda, quantidade, vr_venda, vr_pago, vr_total, vr_custo, vr_troco)
+                               values ({produto_atual[0]}, '{self.tempo_atual()}', {float(values['quantidade_venda_produtos'])}, {produto_atual[4]}, {float(values['vr_pago'])}, {valor_total}, {produto_atual[5]}, {valor_troco})""")
+                window['input_venda_produtos'].update(value = '')
+                window['quantidade_venda_produtos'].update(value = 1)
+                window['vr_total_venda'].update(value = 'R$ 0,00')
+                window['vr_pago'].update(value = 0)
+                self.conn.commit()
+                sg.Popup("Venda realizada com sucesso!")
+
 
         window.close()
 
