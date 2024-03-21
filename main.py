@@ -199,16 +199,37 @@ class main:
             [sg.Button('Salvar', key='salvar_entrada_produtos', font=self.tamanho_letra)]
         ]
 
+        layout_venda_lu = [
+
+            [sg.Text("Produto: ", font=self.tamanho_letra)],
+            [sg.Text("Quantidade: ", font=self.tamanho_letra)],
+        ]
+        
+        layout_venda_ru = [
+            [sg.Input(size=(50,1), key='input_venda_produtos', font=self.tamanho_letra), sg.Button("...", key='consulta_venda_produtos', font=self.tamanho_letra)],
+            [sg.Input(key='quantidade_venda_produtos', default_text=1, enable_events=True, font=self.tamanho_letra)],
+        ]
+        
+        layout_venda_ld = [
+            [sg.Text("Valor total: ", font=self.tamanho_letra)],
+            [sg.Text("Valor pago: ", font=self.tamanho_letra)],
+            [sg.Text("Troco: ", font=self.tamanho_letra)],
+        ]
+        
+        layout_venda_rd = [
+            [sg.Text("R$ 0,00", key='vr_total_venda', font=self.tamanho_letra)],
+            [sg.Input(key='vr_pago', enable_events=True, font=self.tamanho_letra)],
+            [sg.Text("R$ 0,00", key='troco', font=self.tamanho_letra)],
+        ]
+        
         layout_venda = [
             [sg.Text('Venda (saída) de produtos', font=self.tamanho_letra)],
             [sg.HorizontalSeparator()],
-            [sg.Text("Produto: ", font=self.tamanho_letra), sg.Input(size=(50,1), key='input_venda_produtos', font=self.tamanho_letra), sg.Button("...", key='consulta_venda_produtos', font=self.tamanho_letra)],
-            [sg.Text("Quantidade: ", font=self.tamanho_letra), sg.Input(key='quantidade_venda_produtos', default_text=1, enable_events=True, font=self.tamanho_letra)],
+            [sg.Col(layout_venda_lu), sg.Col(layout_venda_ru)],
             [sg.HorizontalSeparator()],
-            [sg.Text("Valor total: ", font=self.tamanho_letra), sg.Text("R$ 0,00", key='vr_total_venda', font=self.tamanho_letra)],
-            [sg.Text("Valor pago: ", font=self.tamanho_letra), sg.Input(key='vr_pago', enable_events=True, font=self.tamanho_letra)],
-            [sg.Text("Troco: ", font=self.tamanho_letra), sg.Text("R$ 0,00", key='troco', font=self.tamanho_letra)],
-            [sg.Button('Salvar', key='salvar_venda_produtos', font=self.tamanho_letra)]]
+            [sg.Col(layout_venda_ld), sg.Col(layout_venda_rd)],
+            [sg.Button('Salvar', key='salvar_venda_produtos', font=self.tamanho_letra)],
+        ]
 
         layout_cadastro_l = [
             [sg.Text('Descrição: ', font=self.tamanho_letra)],
