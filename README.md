@@ -9,4 +9,4 @@ Será feito nessa versão:
     - Tema de visualização da aplicação
     - Diretório e nome do banco de dados
 -> Opção para edição de informações do produto
--> Geração de relatórios
+-> Geração de relatórios (estoque, vendas e entradas)
