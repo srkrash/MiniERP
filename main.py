@@ -252,7 +252,7 @@ class main:
         ]
         layout_sobre = [
             [sg.Text("Desenvolvido por Fay Klagenberg", font=self.tamanho_letra)],
-            [sg.Text("Versão 1.0 Alpha - 20/03/2024", font=self.tamanho_letra)],
+            [sg.Text("Versão 1.1 Alpha - 21/03/2024", font=self.tamanho_letra)],
             [sg.Text("Contato: (64) 99213-9766", font=self.tamanho_letra)],
         ]
 
