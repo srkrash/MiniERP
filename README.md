@@ -9,9 +9,11 @@ Será feito nessa versão:
 -> Criação de sistema para informar forma de pagamento (campos e tabela no banco de dados)
 
 -> Tela para definição de configurações da aplicação (criar tabela no banco para armazenar):
+
     - Tamanho da letra
     - Tema de visualização da aplicação
     - Diretório e nome do banco de dados
+    
 -> Opção para edição de informações do produto
 
 -> Geração de relatórios (estoque, vendas e entradas)
