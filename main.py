@@ -1,18 +1,100 @@
 import PySimpleGUI as sg
 import sqlite3
+import os
 from datetime import datetime
-
 
 class main:
     def __init__(self) -> None:
         self.conn = None
         self.tamanho_letra=24
-
+        self.esquema_referencia = {
+            'vendas': [(0, 'id_venda', 'INTEGER', 1, None, 1), (1, 'id_produto', 'INTEGER', 1, None, 0), (2, 'dt_hr_venda', 'TEXT', 1, None, 0), (3, 'quantidade', 'NUMERIC', 1, '0', 0), (4, 'vr_venda', 'NUMERIC', 1, '0', 0), (5, 'vr_total', 'NUMERIC', 1, '0', 0), (6, 'vr_pago', 'NUMERIC', 1, '0', 0), (7, 'vr_custo', 'NUMERIC', 1, '0', 0), (8, 'vr_troco', 'NUMERIC', 1, '0', 0)],
+            'produtos': [(0, 'id_produto', 'INTEGER', 1, None, 1), (1, 'descricao', 'TEXT(100)', 1, None, 0), (2, 'unidade', 'TEXT(20)', 0, None, 0), (3, 'quantidade', 'NUMERIC', 1, '0', 0), (4, 'vr_venda', 'NUMERIC', 1, '0', 0), (5, 'vr_custo', 'NUMERIC', 1, '0', 0)],
+            'entradas': [(0, 'id_entrada', 'INTEGER', 1, None, 1), (1, 'id_produto', 'INTEGER', 1, None, 0), (2, 'dt_hr_entrada', 'TEXT', 1, None, 0), (3, 'quantidade', 'NUMERIC', 1, '0', 0), (4, 'vr_venda', 'NUMERIC', 1, '0', 0), (5, 'vr_custo', 'NUMERIC', 1, '0', 0)],
+        }
+        
     def fazer_conexao(self):
         self.conn = sqlite3.connect('database.db')
 
     def fechar_conexao(self):
         self.conn.close()
+
+    def obter_esquema_tabela(self, cursor, nome_tabela):
+        cursor = self.conn.cursor()
+        cursor.execute(f"PRAGMA table_info({nome_tabela})")
+        colunas = cursor.fetchall()
+        return colunas
+    
+    def verificar_integridade_bd(self):
+        cursor = self.conn.cursor()
+
+        # Obter o esquema de todas as tabelas no banco de dados
+        esquema_atual = {}
+        tabelas = cursor.execute("SELECT name FROM sqlite_master WHERE type='table' and name!='sqlite_sequence'").fetchall()
+        for tabela in tabelas:
+            nome_tabela = tabela[0]
+            esquema_atual[nome_tabela] = self.obter_esquema_tabela(cursor, nome_tabela)
+
+        # Comparar o esquema atual com o esquema de referência
+        for tabela, colunas_referencia in self.esquema_referencia.items():
+            if tabela not in esquema_atual:
+                self.fechar_conexao()
+                novo_nome = 'database'+self.tempo_atual_nome_arquivo()+'.db'
+                os.rename('database.db', novo_nome)
+                self.fazer_conexao()
+                self.criar_bd_sqlite()
+                return 1
+            
+            colunas_atual = esquema_atual[tabela]
+            if colunas_atual != colunas_referencia:
+                self.fechar_conexao()
+                novo_nome = 'database'+self.tempo_atual_nome_arquivo()+'.db'
+                os.rename('database.db', novo_nome)
+                self.fazer_conexao()
+                self.criar_bd_sqlite()
+                return 1
+        return 0
+
+    def criar_bd_sqlite(self):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+        CREATE TABLE vendas (
+            id_venda INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            id_produto INTEGER NOT NULL,
+            dt_hr_venda TEXT NOT NULL,
+            quantidade NUMERIC DEFAULT (0) NOT NULL,
+            vr_venda NUMERIC DEFAULT (0) NOT NULL,
+            vr_total NUMERIC DEFAULT (0) NOT NULL,
+            vr_pago NUMERIC DEFAULT (0) NOT NULL,
+            vr_custo NUMERIC DEFAULT (0) NOT NULL,
+            vr_troco NUMERIC DEFAULT (0) NOT NULL,
+            CONSTRAINT vendas_produtos_FK FOREIGN KEY (id_produto) REFERENCES produtos(id_produto) ON DELETE CASCADE ON UPDATE CASCADE
+        );
+                    """)
+
+        cursor.execute("""
+        CREATE TABLE produtos (
+            id_produto INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
+            descricao TEXT(100) NOT NULL, 
+            unidade TEXT(20), 
+            quantidade NUMERIC DEFAULT (0) NOT NULL, 
+            vr_venda NUMERIC DEFAULT (0) NOT NULL, 
+            vr_custo NUMERIC DEFAULT (0) NOT NULL
+        );
+                    """)
+
+        cursor.execute("""
+        CREATE TABLE entradas (
+            id_entrada INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            id_produto INTEGER NOT NULL,
+            dt_hr_entrada TEXT NOT NULL,
+            quantidade NUMERIC DEFAULT (0) NOT NULL, 
+            vr_venda NUMERIC DEFAULT (0) NOT NULL, 
+            vr_custo NUMERIC DEFAULT (0) NOT NULL,
+            CONSTRAINT entradas_produtos_FK FOREIGN KEY (id_produto) REFERENCES produtos(id_produto) ON DELETE CASCADE ON UPDATE CASCADE
+        );
+               """)
+        self.conn.commit()
 
     def fetch_data_from_db(self, table):
         cursor = self.conn.cursor()
@@ -50,6 +132,13 @@ class main:
         # Formatar o tempo no formato desejado
         tempo_formatado = tempo_agora.strftime("%Y-%m-%d %H:%M:%S")
         return tempo_formatado
+    
+    def tempo_atual_nome_arquivo(self):
+        # Obter o tempo atual
+        tempo_agora = datetime.now()
+        # Formatar o tempo no formato desejado
+        tempo_formatado = tempo_agora.strftime("%Y%m%d%H%M%S")
+        return tempo_formatado
 
     def telaconsulta(self, produtos):
         headings = ["id_produto", "descricao", "quantidade"]
@@ -73,6 +162,8 @@ class main:
     def window(self):
         produto_atual = None
         self.fazer_conexao()
+        if self.verificar_integridade_bd():
+            sg.Popup("Banco de dados novo criado por problemas na estrutura. Se for a primeira vez abrindo, ignore esse erro")
         cursor = self.conn.cursor()
         headings_produtos = self.colunas('produtos')
         data_produtos = self.fetch_data_from_db('produtos')
@@ -177,6 +268,8 @@ class main:
                 window['vr_custo'].update(value='')
                 data = self.fetch_data_from_db('produtos')
                 window['tabela_estoque'].update(values=data)
+                data = self.fetch_data_from_db('produtos')
+                window['tabela_estoque'].update(values=data)
                 sg.popup("Cadastro realizado com sucesso!")
             elif event == 'consulta_entrada_produtos':
                 cursor.execute(f"select id_produto, descricao, quantidade from produtos where descricao like '%{values['input_entrada_produtos']}%';")
@@ -209,6 +302,8 @@ class main:
                 window['vr_venda_entrada_produtos'].update(value = '')
                 window['vr_calculado_entrada_produtos'].update(value = 'R$ 0.00')
                 self.conn.commit()
+                data = self.fetch_data_from_db('produtos')
+                window['tabela_estoque'].update(values=data)
                 sg.Popup("Entrada realizada com sucesso!")
             elif event == 'consulta_venda_produtos':
                 cursor.execute(f"select id_produto, descricao, quantidade from produtos where descricao like '%{values['input_venda_produtos']}%';")
@@ -245,9 +340,9 @@ class main:
                 window['vr_total_venda'].update(value = 'R$ 0,00')
                 window['vr_pago'].update(value = 0)
                 self.conn.commit()
+                data = self.fetch_data_from_db('produtos')
+                window['tabela_estoque'].update(values=data)
                 sg.Popup("Venda realizada com sucesso!")
-
-
         window.close()
 
 main().window()
